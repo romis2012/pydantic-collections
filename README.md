@@ -1,5 +1,8 @@
 # pydantic-collections
 
+[![Build Status](https://app.travis-ci.com/romis2012/pydantic-collections.svg?branch=master)](https://app.travis-ci.com/romis2012/pydantic-collections)
+[![Coverage Status](https://coveralls.io/repos/github/romis2012/pydantic-collections/badge.svg?branch=master)](https://coveralls.io/github/romis2012/pydantic-collections?branch=master)
+
 The `pydantic-collections` package provides `BaseCollectionModel` class that allows you 
 to manipulate collections of [pydantic](https://github.com/samuelcolvin/pydantic) models 
 (and any other types supported by pydantic).
@@ -18,7 +21,7 @@ pip install pydantic-collections
 
 ## Usage
 
-#### basic usage
+#### Basic usage
 ```python
 
 from datetime import datetime
@@ -51,7 +54,7 @@ print(users.json())
 #> [{"id": 1, "name": "Bender", "birth_date": "2010-04-01T12:59:59"}, {"id": 2, "name": "Balaganov", "birth_date": "2020-04-01T12:59:59"}]
 ```
 
-#### strict assignment validation
+#### Strict assignment validation
 
 By default `BaseCollectionModel` has a strict assignment check
 ```python
@@ -77,7 +80,7 @@ assert users[0].__class__ is User
 assert users[0].id == 1
 ```
 
-#### using as a model field
+#### Using as a model field
 
 `BaseCollectionModel` is a subclass of `BaseModel`, so you can use it as a model field
 ```python
