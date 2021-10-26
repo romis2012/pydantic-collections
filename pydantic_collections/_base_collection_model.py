@@ -65,12 +65,8 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         if self.__config__.validate_assignment_strict:
             if self.__el_field__.allow_none and value is None:
                 pass  # pragma: no cover
-            elif not isinstance(value, self.__el_field__.type_):
-                error = ArbitraryTypeError(expected_arbitrary_type=self.__el_field__.type_)
-                raise ValidationError(
-                    [ErrorWrapper(exc=error, loc='{} -> {}'.format('__root__', index))],
-                    self.__class__,
-                )
+            else:
+                self._validate_element_type(self.__el_field__, value, index)
 
         value, err = self.__el_field__.validate(
             value,
@@ -90,6 +86,21 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
 
         return value
 
+    def _validate_element_type(self, field: ModelField, value: Any, index: int):
+        def get_field_types(fld: ModelField):
+            if fld.sub_fields:
+                for sub_field in fld.sub_fields:
+                    yield from get_field_types(sub_field)
+            else:
+                yield fld.type_
+
+        if not isinstance(value, tuple(get_field_types(field))):
+            error = ArbitraryTypeError(expected_arbitrary_type=field.type_)
+            raise ValidationError(
+                [ErrorWrapper(exc=error, loc='{} -> {}'.format('__root__', index))],
+                self.__class__,
+            )
+
     def __len__(self):
         return len(self.__root__)
 
@@ -107,10 +118,10 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         yield from self.__root__
 
     def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.__root__)
+        return '{}({!r})'.format(self.__class__.__name__, self.__root__)  # pragma: no cover
 
     def __str__(self):
-        return repr(self)
+        return repr(self)  # pragma: no cover
 
     def insert(self, index, value):
         self.__root__.insert(index, self._validate_element(value, index))

@@ -1,5 +1,5 @@
 import pytest
-
+from typing import Optional, Union
 from datetime import datetime
 
 from pydantic import BaseModel, ValidationError
@@ -32,7 +32,15 @@ class WeakUserCollection(BaseCollectionModel[User]):
         validate_assignment_strict = False
 
 
-data = [
+class OptionalIntCollection(BaseCollectionModel[Optional[int]]):
+    pass
+
+
+class IntOrOptionalDatetimeCollection(BaseCollectionModel[Union[int, Optional[datetime]]]):
+    pass
+
+
+user_data = [
     {
         'id': 1,
         'name': 'Bender',
@@ -47,11 +55,11 @@ data = [
 
 
 def test_collection_validation_serialization():
-    user0 = User(**data[0])
-    user1 = User(**data[1])
+    user0 = User(**user_data[0])
+    user1 = User(**user_data[1])
 
-    users = UserCollection(data)
-    assert len(users) == len(data)
+    users = UserCollection(user_data)
+    assert len(users) == len(user_data)
     assert users[0] == user0
     assert users[1] == user1
 
@@ -61,9 +69,13 @@ def test_collection_validation_serialization():
     for (u1, u2) in zip(users, users2):
         assert u1 == u2
 
+    users3 = UserCollection.parse_obj(users.dict())
+    for (u1, u2) in zip(users, users3):
+        assert u1 == u2
+
 
 def test_collection_sort():
-    users = UserCollection(data)
+    users = UserCollection(user_data)
     reversed_users = users.sort(key=lambda u: u.id, reverse=True)
     assert reversed_users[0] == users[1]
     assert reversed_users[1] == users[0]
@@ -71,24 +83,66 @@ def test_collection_sort():
 
 def test_collection_assignment_validation():
     users = UserCollection()
-    for item in data:
+    for item in user_data:
         users.append(User(**item))
 
     with pytest.raises(ValidationError):
-        users.append(data[0])  # noqa
+        users.append(user_data[0])  # noqa
 
     with pytest.raises(ValidationError):
-        users[0] = data[0]
+        users[0] = user_data[0]
 
     weak_users = WeakUserCollection()
-    for d in data:
+    for d in user_data:
         weak_users.append(d)  # noqa
 
     for user in weak_users:
         assert user.__class__ is User
 
-    for (u1, u2) in zip(weak_users, data):
+    for (u1, u2) in zip(weak_users, user_data):
         assert u1 == User(**u2)
 
     with pytest.raises(ValidationError):
         weak_users.append('user')  # noqa
+
+
+def test_optional_collection():
+    data = [1, None]
+    c = OptionalIntCollection()
+    for el in data:
+        c.append(el)
+
+    for (item1, item2) in zip(c, data):
+        assert item1 == item2
+
+
+def test_union_collection():
+    data = [1, datetime.utcnow(), None]
+    c = IntOrOptionalDatetimeCollection()
+    for el in data:
+        c.append(el)
+
+    for (item1, item2) in zip(c, data):
+        assert item1 == item2
+
+    with pytest.raises(ValidationError):
+        c.append('data')  # noqa
+
+
+def test_collection_sequence_methods():
+    users = UserCollection()
+    for item in user_data:
+        users.append(User(**item))
+
+    assert len(users) == len(user_data)
+
+    user0 = User(**user_data[0])
+    users.insert(0, user0)
+    assert users[0] == user0
+    assert len(users) == len(user_data) + 1
+
+    users[-1] = user0
+    assert users[-1] == user0
+
+    users.clear()
+    assert len(users) == 0
