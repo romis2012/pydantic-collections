@@ -1,7 +1,8 @@
 # pydantic-collections
 
 [![Build Status](https://app.travis-ci.com/romis2012/pydantic-collections.svg?branch=master)](https://app.travis-ci.com/romis2012/pydantic-collections)
-[![Coverage Status](https://coveralls.io/repos/github/romis2012/pydantic-collections/badge.svg?branch=master)](https://coveralls.io/github/romis2012/pydantic-collections?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/romis2012/pydantic-collections/badge.svg?branch=master&_=x)](https://coveralls.io/github/romis2012/pydantic-collections?branch=master)
+[![PyPI version](https://badge.fury.io/py/pydantic-collections.svg)](https://badge.fury.io/py/pydantic-collections)
 
 The `pydantic-collections` package provides `BaseCollectionModel` class that allows you 
 to manipulate collections of [pydantic](https://github.com/samuelcolvin/pydantic) models 
