@@ -1,3 +1,4 @@
+import functools
 import warnings
 from typing import Optional, List, MutableSequence, Type, TypeVar, Any, Callable
 
@@ -14,7 +15,25 @@ class CollectionModelConfig(BaseConfig):
     validate_assignment_strict = False
 
 
+def tp_cache(func):
+    """Internal wrapper caching __getitem__ of generic types with a fallback to
+    original function for non-hashable arguments.
+    """
+    cached = functools.lru_cache(maxsize=None, typed=True)(func)
+
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        try:
+            return cached(*args, **kwargs)
+        except TypeError:  # pragma: no cover
+            pass  # All real errors (not unhashable args) are raised below.
+        return func(*args, **kwargs)  # pragma: no cover
+
+    return inner
+
+
 class BaseCollectionModelMeta(ModelMetaclass):
+    @tp_cache
     def __getitem__(cls: Type['BaseCollectionModel'], el_type):
         if not issubclass(cls, BaseCollectionModel):
             raise TypeError('{!r} is not a BaseCollectionModel'.format(cls))  # pragma: no cover
