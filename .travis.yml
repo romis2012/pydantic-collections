@@ -8,6 +8,8 @@ python:
   - "3.9"
 
 install:
+  # to fix https://travis-ci.community/t/build-error-for-python-3-7-on-two-different-projects/12895
+  - pip install importlib_metadata -U
   - pip install -r requirements-dev.txt -U
   - pip install -e .
 
