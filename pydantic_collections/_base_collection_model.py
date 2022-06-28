@@ -1,6 +1,6 @@
 import functools
 import warnings
-from typing import Optional, List, MutableSequence, Type, TypeVar, Any, Callable
+from typing import Optional, List, MutableSequence, Type, TypeVar, Any, Callable, TYPE_CHECKING
 
 from pydantic import BaseModel, BaseConfig, ValidationError
 from pydantic.error_wrappers import ErrorWrapper
@@ -59,8 +59,10 @@ T = TypeVar('T')
 
 
 class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectionModelMeta):
-    __el_field__: ModelField
-    __config__: Type[CollectionModelConfig]
+    if TYPE_CHECKING:  # pragma: no cover
+        __el_field__: ModelField
+        __config__: Type[CollectionModelConfig]
+        __root__: List[T]
 
     class Config(CollectionModelConfig):
         extra = Extra.forbid
@@ -153,29 +155,12 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         data = sorted(self.__root__, key=key, reverse=reverse)
         return self.__class__(data)
 
-    def dict(
-        self,
-        *,
-        include=None,
-        exclude=None,
-        by_alias=False,
-        skip_defaults=None,
-        exclude_unset=False,
-        exclude_defaults=False,
-        exclude_none=False,
-    ) -> List[T]:
-        data = super().dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
+    def dict(self, **kwargs) -> List[T]:
+        data = super().dict()
         # Original pydantic dict(...) returns a dict of the form {'__root__': [...]}
         # this behavior will be change in ver 2.0
         # https://github.com/samuelcolvin/pydantic/issues/1193
+        # consider return [el.dict(**kwargs) for el in self]
         if isinstance(data, dict):
             return data['__root__']
         else:
