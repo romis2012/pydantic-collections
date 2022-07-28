@@ -155,12 +155,11 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         data = sorted(self.__root__, key=key, reverse=reverse)
         return self.__class__(data)
 
-    def dict(self, **kwargs) -> List[T]:
-        data = super().dict()
+    def dict(self, *, by_alias=False, **kwargs) -> List[T]:
+        data = super().dict(by_alias=by_alias)
         # Original pydantic dict(...) returns a dict of the form {'__root__': [...]}
         # this behavior will be change in ver 2.0
         # https://github.com/samuelcolvin/pydantic/issues/1193
-        # consider return [el.dict(**kwargs) for el in self]
         if isinstance(data, dict):
             return data['__root__']
         else:
