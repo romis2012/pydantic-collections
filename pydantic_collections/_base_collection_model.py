@@ -155,8 +155,23 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         data = sorted(self.__root__, key=key, reverse=reverse)
         return self.__class__(data)
 
-    def dict(self, *, by_alias=False, **kwargs) -> List[T]:
-        data = super().dict(by_alias=by_alias)
+    def dict(
+        self,
+        *,
+        by_alias=False,
+        skip_defaults: bool = None,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        **kwargs,
+    ) -> List[T]:
+        data = super().dict(
+            by_alias=by_alias,
+            skip_defaults=skip_defaults,
+            exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
+            exclude_none=exclude_none,
+        )
         # Original pydantic dict(...) returns a dict of the form {'__root__': [...]}
         # this behavior will be change in ver 2.0
         # https://github.com/samuelcolvin/pydantic/issues/1193
