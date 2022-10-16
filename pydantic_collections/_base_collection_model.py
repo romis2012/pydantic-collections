@@ -126,7 +126,10 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         return len(self.__root__)
 
     def __getitem__(self, index):
-        return self.__root__[index]
+        if isinstance(index, slice):
+            return self.__class__(self.__root__[index])
+        else:
+            return self.__root__[index]
 
     def __setitem__(self, index, value):
         self.__root__[index] = self._validate_element(value, index)
