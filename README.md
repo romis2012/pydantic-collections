@@ -10,8 +10,8 @@ to manipulate collections of [pydantic](https://github.com/samuelcolvin/pydantic
 
 
 ## Requirements
-- Python >= 3.7
-- pydantic >= 1.8.2
+- Python>=3.7
+- pydantic>=1.8.2,<2.0
 
 
 ## Installation

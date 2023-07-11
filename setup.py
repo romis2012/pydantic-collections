@@ -35,5 +35,5 @@ setup(
     long_description_content_type='text/markdown',
     packages=['pydantic_collections'],
     keywords='python pydantic validation parsing serialization models',
-    install_requires=['pydantic>=1.8.2']
+    install_requires=['pydantic>=1.8.2,<2.0']
 )

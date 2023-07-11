@@ -1,5 +1,5 @@
 __title__ = 'pydantic-collections'
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 from ._base_collection_model import BaseCollectionModel
 
