@@ -11,7 +11,7 @@ to manipulate collections of [pydantic](https://github.com/samuelcolvin/pydantic
 
 ## Requirements
 - Python>=3.7
-- pydantic>=1.8.2,<2.0
+- pydantic>=1.8.2,<3.0
 
 
 ## Installation
@@ -47,11 +47,16 @@ class UserCollection(BaseCollectionModel[User]):
     ]
 
 users = UserCollection(user_data)
+
 print(users)
 #> UserCollection([User(id=1, name='Bender', birth_date=datetime.datetime(2010, 4, 1, 12, 59, 59)), User(id=2, name='Balaganov', birth_date=datetime.datetime(2020, 4, 1, 12, 59, 59))])
-print(users.dict())
+
+print(users.dict())  # pydantic v1.x
+print(users.model_dump())  # pydantic v2.x
 #> [{'id': 1, 'name': 'Bender', 'birth_date': datetime.datetime(2010, 4, 1, 12, 59, 59)}, {'id': 2, 'name': 'Balaganov', 'birth_date': datetime.datetime(2020, 4, 1, 12, 59, 59)}]
-print(users.json())
+
+print(users.json()) # pydantic v1.x
+print(users.model_dump_json()) # pydantic v2.x
 #> [{"id": 1, "name": "Bender", "birth_date": "2010-04-01T12:59:59"}, {"id": 2, "name": "Balaganov", "birth_date": "2020-04-01T12:59:59"}]
 ```
 
@@ -69,12 +74,25 @@ users.append({'id': 1, 'name': 'Bender', 'birth_date': '2010-04-01T12:59:59'})
 ```
 
 This behavior can be changed via Model Config
+
+Pydantic v1.x
 ```python
+from pydantic_collections import BaseCollectionModel
 ...
 class UserCollection(BaseCollectionModel[User]):
     class Config:
         validate_assignment_strict = False
-        
+```
+
+Pydantic v2.x
+```python
+from pydantic_collections import BaseCollectionModel, CollectionModelConfig
+...
+class UserCollection(BaseCollectionModel[User]):
+    model_config = CollectionModelConfig(validate_assignment_strict=False)
+```
+
+```python
 users = UserCollection()
 users.append({'id': 1, 'name': 'Bender', 'birth_date': '2010-04-01T12:59:59'})  # OK
 assert users[0].__class__ is User
