@@ -1,4 +1,9 @@
 import pytest
+from pydantic_collections import PYDANTIC_V2
+
+if PYDANTIC_V2:
+    pytest.skip('Skipped', allow_module_level=True)
+
 from typing import Optional, Union
 from datetime import datetime
 
