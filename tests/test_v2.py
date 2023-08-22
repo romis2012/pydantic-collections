@@ -33,7 +33,7 @@ class UserCollection(BaseCollectionModel[User]):
 
 
 class WeakUserCollection(BaseCollectionModel[User]):
-    model_config = CollectionModelConfig(validate_assignment_strict = False)
+    model_config = CollectionModelConfig(validate_assignment_strict=False)
 
 
 class OptionalIntCollection(BaseCollectionModel[Optional[int]]):

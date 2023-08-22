@@ -7,11 +7,11 @@ PYDANTIC_V2 = PYDANTIC_VERSION.startswith('2.')
 
 
 if PYDANTIC_V2:
-    from ._v2 import BaseCollectionModel, CollectionModelConfig
+    from ._v2 import BaseCollectionModel, CollectionModelConfig  # noqa: F401
 
     __all_v__ = ('CollectionModelConfig',)
 else:
-    from ._v1 import BaseCollectionModel
+    from ._v1 import BaseCollectionModel  # noqa: F401
 
     __all_v__ = ()
 
