@@ -92,7 +92,7 @@ class BaseCollectionModel(
         __element__: Element
 
     model_config = CollectionModelConfig(
-        extra='forbid',
+        # extra='forbid',
         validate_assignment=True,
         validate_assignment_strict=True,
     )
