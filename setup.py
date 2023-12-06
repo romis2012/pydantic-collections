@@ -5,7 +5,7 @@ import sys
 from setuptools import setup
 
 if sys.version_info < (3, 7, 1):
-    raise RuntimeError('pydantic-collections requires Python 3.6.1+')
+    raise RuntimeError('pydantic-collections requires Python 3.7.1+')
 
 
 def get_version():
