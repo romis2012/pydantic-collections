@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools
+          pip install "pydantic>=2.0.2,<3.0.0"
           pip install -r requirements-dev.txt
       - name: Lint with flake8
         run: |
