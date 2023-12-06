@@ -12,8 +12,7 @@ from typing import (
     Dict,
 )
 
-from pydantic import RootModel, TypeAdapter, ConfigDict, ValidationError
-from pydantic._internal._model_construction import ModelMetaclass
+from pydantic import BaseModel, RootModel, TypeAdapter, ConfigDict, ValidationError
 from pydantic_core import PydanticUndefined, ErrorDetails
 from typing_extensions import get_origin, get_args
 
@@ -66,7 +65,7 @@ class Element:
     adapter: TypeAdapter
 
 
-class BaseCollectionModelMeta(ModelMetaclass):
+class BaseCollectionModelMeta(BaseModel.__class__):
     @tp_cache
     def __getitem__(cls: Type['BaseCollectionModel'], el_type):
         if not issubclass(cls, BaseCollectionModel):
@@ -92,7 +91,6 @@ class BaseCollectionModel(
         __element__: Element
 
     model_config = CollectionModelConfig(
-        # extra='forbid',
         validate_assignment=True,
         validate_assignment_strict=True,
     )
