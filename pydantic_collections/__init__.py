@@ -1,5 +1,5 @@
 __title__ = 'pydantic-collections'
-__version__ = '0.5.2'
+__version__ = '0.5.4'
 
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
