@@ -1,18 +1,18 @@
-import collections.abc
 import functools
 import types
 from dataclasses import dataclass
 from typing import (
-    Type,
     List,
     TYPE_CHECKING,
     Any,
     Tuple,
     Union,
     Dict,
+    TypeVar,
+    MutableSequence,
 )
 
-from pydantic import BaseModel, RootModel, TypeAdapter, ConfigDict, ValidationError
+from pydantic import RootModel, TypeAdapter, ConfigDict, ValidationError
 from pydantic_core import PydanticUndefined, ErrorDetails
 from typing_extensions import get_origin, get_args
 
@@ -65,9 +65,21 @@ class Element:
     adapter: TypeAdapter
 
 
-class BaseCollectionModelMeta(BaseModel.__class__):
+TElement = TypeVar("TElement")
+
+
+class BaseCollectionModel(MutableSequence[TElement], RootModel[List[TElement]]):
+    if TYPE_CHECKING:  # pragma: no cover
+        __element__: Element
+
+    # noinspection Pydantic
+    model_config = CollectionModelConfig(
+        validate_assignment=True,
+        validate_assignment_strict=True,
+    )
+
     @tp_cache
-    def __getitem__(cls: Type['BaseCollectionModel'], el_type):
+    def __class_getitem__(cls, el_type):
         if not issubclass(cls, BaseCollectionModel):
             raise TypeError('{!r} is not a BaseCollectionModel'.format(cls))  # pragma: no cover
 
@@ -80,20 +92,6 @@ class BaseCollectionModelMeta(BaseModel.__class__):
                 '__annotations__': {'root': List[el_type]},
             },
         )
-
-
-class BaseCollectionModel(
-    RootModel,
-    collections.abc.MutableSequence,
-    metaclass=BaseCollectionModelMeta,
-):
-    if TYPE_CHECKING:  # pragma: no cover
-        __element__: Element
-
-    model_config = CollectionModelConfig(
-        validate_assignment=True,
-        validate_assignment_strict=True,
-    )
 
     def __init__(self, data: list = None, root=PydanticUndefined, **kwargs):
         if root is PydanticUndefined:

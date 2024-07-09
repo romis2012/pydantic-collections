@@ -8,7 +8,7 @@ from pydantic.errors import ArbitraryTypeError
 from pydantic.fields import ModelField, Undefined
 
 # noinspection PyProtectedMember
-from pydantic.main import ModelMetaclass, Extra
+from pydantic.main import Extra
 
 
 class CollectionModelConfig(BaseConfig):
@@ -32,9 +32,22 @@ def tp_cache(func):
     return inner
 
 
-class BaseCollectionModelMeta(ModelMetaclass):
+TElement = TypeVar('TElement')
+
+
+class BaseCollectionModel(BaseModel, MutableSequence[TElement]):
+    if TYPE_CHECKING:  # pragma: no cover
+        __el_field__: ModelField
+        __config__: Type[CollectionModelConfig]
+        __root__: List[TElement]
+
+    class Config(CollectionModelConfig):
+        extra = Extra.forbid
+        validate_assignment = True
+        validate_assignment_strict = True
+
     @tp_cache
-    def __getitem__(cls: Type['BaseCollectionModel'], el_type):
+    def __class_getitem__(cls, el_type):
         if not issubclass(cls, BaseCollectionModel):
             raise TypeError('{!r} is not a BaseCollectionModel'.format(cls))  # pragma: no cover
 
@@ -53,21 +66,6 @@ class BaseCollectionModelMeta(ModelMetaclass):
                 '__annotations__': {'__root__': List[el_type]},
             },
         )
-
-
-T = TypeVar('T')
-
-
-class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectionModelMeta):
-    if TYPE_CHECKING:  # pragma: no cover
-        __el_field__: ModelField
-        __config__: Type[CollectionModelConfig]
-        __root__: List[T]
-
-    class Config(CollectionModelConfig):
-        extra = Extra.forbid
-        validate_assignment = True
-        validate_assignment_strict = True
 
     def __init__(self, data: list = None, **kwargs):
         __root__ = kwargs.get('__root__')
@@ -138,7 +136,7 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
     def __delitem__(self, index):
         del self.__root__[index]
 
-    def __iter__(self) -> List[T]:
+    def __iter__(self) -> List[TElement]:
         yield from self.__root__
 
     def __repr__(self):
@@ -167,7 +165,7 @@ class BaseCollectionModel(BaseModel, MutableSequence[T], metaclass=BaseCollectio
         exclude_defaults: bool = False,
         exclude_none: bool = False,
         **kwargs,
-    ) -> List[T]:
+    ) -> List[TElement]:
         data = super().dict(
             by_alias=by_alias,
             skip_defaults=skip_defaults,
