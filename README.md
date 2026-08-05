@@ -8,6 +8,12 @@ The `pydantic-collections` package provides `BaseCollectionModel` class that all
 to manipulate collections of [pydantic](https://github.com/samuelcolvin/pydantic) models 
 (and any other types supported by pydantic).
 
+⚠️ **Project Archived** 
+
+This repository has been archived and is now read-only.
+With the release of **Pydantic V2**, this package is no longer needed. All core functionality for validating, serializing, and managing collections of models can now be easily achieved using the native [RootModel](https://pydantic.dev/docs/validation/dev/concepts/models/#rootmodel-and-custom-root-types) type. 
+
+Thank you to everyone who used and supported this project!
 
 ## Requirements
 - Python>=3.7
